@@ -1,6 +1,9 @@
 const express = require('express');
-const { ApolloServer } = require('apollo-server-express');
 const mongoose = require('mongoose');
+const { ApolloServer } = require('@apollo/server');
+const { expressMiddleware } = require('@apollo/server/express4');
+const path = require('path');
+
 const typeDefs = require('./graphql/schema');
 const resolvers = require('./graphql/resolvers');
 const userController = require('./controllers/userController');
@@ -13,14 +16,9 @@ app.post('/register', userController.register);
 app.post('/login', userController.login);
 app.post('/authenticate', userController.authenticate);
 
-// Start the server
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
-});
-
 // Connect to your MongoDB database
-//replace 'mongodb://localhost:27017/mydatabase' with 
-//the appropriate MongoDB connection string for your database.
+// Replace 'mongodb://localhost:27017/mydatabase' with
+// the appropriate MongoDB connection string for your database.
 
 mongoose.connect('mongodb://localhost:27017/mydatabase', {
   useNewUrlParser: true,
@@ -38,10 +36,22 @@ const server = new ApolloServer({
   },
 });
 
-server.applyMiddleware({ app });
+server.start().then(() => {
+  app.use(express.urlencoded({ extended: false }));
+  app.use(express.json());
 
-const PORT = 4000;
+  app.use('/graphql', expressMiddleware(server));
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}/graphql`);
+  if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../client/dist')));
+
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+    });
+  }
+
+  app.listen(PORT, () => {
+    console.log(`API server running on port ${PORT}!`);
+    console.log(`Use GraphQL at http://localhost:${PORT}/graphql`);
+  });
 });
