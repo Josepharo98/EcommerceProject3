@@ -1,5 +1,5 @@
 {
-  "name": "programming-thoughts",
+  "name": "ecommerceproject3",
   "version": "1.0.0",
   "description": "",
   "main": "server/server.js",
@@ -13,6 +13,15 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "@apollo/client": "^3.8.8",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "graphql": "^16.8.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.3"
+  },
   "devDependencies": {
     "concurrently": "^8.2.0"
   }
